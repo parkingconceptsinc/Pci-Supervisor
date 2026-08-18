@@ -117,6 +117,29 @@ body{
 .hdr-status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);transition:background 0.3s ease,box-shadow 0.3s ease;flex-shrink:0}
 .hdr-status-dot.offline{background:#EF4444;box-shadow:0 0 8px #EF4444}
 
+.lang-switch{position:relative;margin-top:6px}
+.lang-btn{
+  display:flex;align-items:center;gap:4px;
+  background:var(--surface);border:1px solid var(--border);color:var(--text-mid);
+  border-radius:999px;padding:4px 9px;font-size:10.5px;font-weight:700;letter-spacing:0.04em;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.lang-caret{font-size:8px;opacity:0.8}
+.lang-menu{
+  position:absolute;top:calc(100% + 6px);right:0;z-index:20;
+  background:var(--toast-bg);backdrop-filter:blur(var(--blur-glass));
+  border:1px solid var(--border-hi);border-radius:var(--radius-sm);
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  display:flex;flex-direction:column;min-width:110px;overflow:hidden;
+}
+.lang-menu[hidden]{display:none}
+.lang-opt{
+  background:transparent;border:0;color:var(--text-hi);text-align:left;
+  padding:9px 12px;font-size:12.5px;font-weight:600;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.lang-opt:hover,.lang-opt.active{background:var(--surface-hi)}
+
 /* Tabs */
 .tabs{
   position:relative;
@@ -387,16 +410,25 @@ body{
           <span id="hdrStatusText">Online</span>
         </span>
       </div>
+      <div class="lang-switch">
+        <button type="button" class="lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false">
+          <span id="langBtnLabel">EN</span><span class="lang-caret">&#9662;</span>
+        </button>
+        <div class="lang-menu" id="langMenu" hidden>
+          <button type="button" class="lang-opt" data-lang="en">English</button>
+          <button type="button" class="lang-opt" data-lang="es">Español</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="tabs" role="tablist" aria-label="Secciones">
     <div class="tab-indicator" id="tab-indicator"></div>
     <button class="tab-btn is-active tone-reports" role="tab" id="tab-reports" aria-selected="true" aria-controls="panel-reports" onclick="showTab('reports',this)">
-      <svg aria-hidden="true"><use href="#icon-report"></use></svg>Reports
+      <svg aria-hidden="true"><use href="#icon-report"></use></svg><span data-i18n="tabReports">Reports</span>
     </button>
     <button class="tab-btn tone-data" role="tab" id="tab-data" aria-selected="false" aria-controls="panel-data" tabindex="-1" onclick="showTab('data',this)">
-      <svg aria-hidden="true"><use href="#icon-chart"></use></svg>Data
+      <svg aria-hidden="true"><use href="#icon-chart"></use></svg><span data-i18n="tabData">Data</span>
     </button>
   </div>
 
@@ -420,7 +452,7 @@ body{
   <div class="app-view-bar">
     <button type="button" class="app-view-back" id="appViewBack" onclick="closeApp()">
       <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-      Home
+      <span data-i18n="home">Home</span>
     </button>
     <span class="app-view-title" id="appViewTitle"></span>
   </div>
@@ -428,11 +460,11 @@ body{
     <iframe id="appViewFrame" title="App content" referrerpolicy="no-referrer-when-downgrade"></iframe>
     <div class="app-view-loading" id="appViewLoading">
       <span class="app-view-spinner" aria-hidden="true"></span>
-      <span>Loading…</span>
+      <span data-i18n="loading">Loading…</span>
     </div>
     <div class="app-view-error" id="appViewError">
-      <span>This app didn't load inside the dashboard.</span>
-      <a id="appViewErrorLink" href="#" target="_blank" rel="noopener noreferrer">Open in browser instead</a>
+      <span data-i18n="errLoad">This app didn't load inside the dashboard.</span>
+      <a id="appViewErrorLink" href="#" target="_blank" rel="noopener noreferrer" data-i18n="errLink">Open in browser instead</a>
     </div>
   </div>
 </div>
@@ -442,22 +474,22 @@ body{
 // the DOM is generated from this array, so no more copy-pasting button markup.
 const REPORTS = [
   { href: "https://script.google.com/macros/s/AKfycbzrJq_nQsNucXWAS8_oOSTgZt_F2VQmYQH-QHv-Xau3TSIZOATZqeFZtGZHa51O8UhLjg/exec",
-    icon: "icon-car", label: "VEHICLE INSPECTION", sub: "Pre-patrol Inspection Form" },
+    icon: "icon-car", label: "VEHICLE INSPECTION", sub: "Pre-patrol Inspection Form", subEs: "Formulario de inspección previa" },
   { href: "https://script.google.com/macros/s/AKfycbz3RhlSBw7cRauNCgah3HuvHVLRVwzXT3wOLAs_FUFAdVqbzFIsecnimA_DarB7Ir0s/exec",
-    icon: "icon-report", label: "REPORTS", sub: "Activity Report Form" },
+    icon: "icon-report", label: "REPORTS", sub: "Activity Report Form", subEs: "Formulario de reporte de actividad" },
   { href: "https://script.google.com/macros/s/AKfycbz2KaANhRWIS8ibyWljznW04M6PJoF5PJuNbzve42nqXDvn_mYBqfTlBISf6jb4prRi/exec",
-    icon: "icon-fuel", label: "FUEL EXPENSE TRACKER", sub: "Log fill-ups & cost" },
+    icon: "icon-fuel", label: "FUEL EXPENSE TRACKER", sub: "Log fill-ups & cost", subEs: "Registrar cargas y costos" },
   { href: "https://script.google.com/macros/s/AKfycbxj7GHP1QO0k9tteNv_wJ2Q53dgrwp35Flqad9FfYF1o_zXARK60LW1T2kaarY5ujpp4g/exec",
-    icon: "icon-share", label: "SHARING POINT", sub: "Shared files & resources" }
+    icon: "icon-share", label: "SHARING POINT", sub: "Shared files & resources", subEs: "Archivos y recursos compartidos" }
 ];
 
 const DATA = [
   { href: "https://script.google.com/macros/s/AKfycbwVbW74uljSkHZfqgu_w9dCTOIdoD8B4faApf0CD8iHCmmc0o0HDB_TqvxbaI1rJ72k/exec?page=dashboard",
-    icon: "icon-car", label: "VEHICLE INSPECTION", sub: "Live dashboard" },
+    icon: "icon-car", label: "VEHICLE INSPECTION", sub: "Live dashboard", subEs: "Panel en vivo" },
   { href: "https://script.google.com/macros/s/AKfycbz3RhlSBw7cRauNCgah3HuvHVLRVwzXT3wOLAs_FUFAdVqbzFIsecnimA_DarB7Ir0s/exec?page=dashboard",
-    icon: "icon-report", label: "REPORTS", sub: "Reports dashboard" },
+    icon: "icon-report", label: "REPORTS", sub: "Reports dashboard", subEs: "Panel de reportes" },
   { href: "https://script.google.com/macros/s/AKfycbz2KaANhRWIS8ibyWljznW04M6PJoF5PJuNbzve42nqXDvn_mYBqfTlBISf6jb4prRi/exec?page=dashboard",
-    icon: "icon-fuel", label: "FUEL EXPENSE TRACKER", sub: "Live spreadsheet" }
+    icon: "icon-fuel", label: "FUEL EXPENSE TRACKER", sub: "Live spreadsheet", subEs: "Hoja de cálculo en vivo" }
 ];
 
 function renderList(containerId, items){
@@ -467,7 +499,7 @@ function renderList(containerId, items){
       <div class="neu-icon" aria-hidden="true"><svg><use href="#${item.icon}"></use></svg></div>
       <div class="neu-text">
         <span class="neu-label">${item.label}</span>
-        <span class="neu-sub">${item.sub}</span>
+        <span class="neu-sub" data-en="${item.sub}" data-es="${item.subEs}">${item.sub}</span>
       </div>
     </button>
   `).join('');
@@ -605,16 +637,85 @@ function doRipple(e, label){
   circle.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX-rect.left-d/2}px;top:${e.clientY-rect.top-d/2}px`;
   btn.appendChild(circle);
   circle.addEventListener('animationend', () => circle.remove());
-  showToast('Opening ' + label + '…');
+  showToast(t('opening', {label}));
 }
 
 function showToast(msg){
-  const t = document.getElementById('toast');
+  const el = document.getElementById('toast');
   if (toastTimer) clearTimeout(toastTimer);
-  t.textContent = msg;
-  t.classList.add('show');
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+  el.textContent = msg;
+  el.classList.add('show');
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
 }
+
+/* ---------- i18n (English default, Spanish optional) ---------- */
+const I18N = {
+  en: {
+    tabReports:'Reports', tabData:'Data', home:'Home', loading:'Loading…',
+    errLoad:"This app didn't load inside the dashboard.", errLink:'Open in browser instead',
+    online:'Online', offline:'Offline', opening:'Opening {label}…',
+    installAvail:'Supervisor Dashboard can be installed.',
+    installHint:'Use your browser menu and choose Install app / Add to Home Screen.',
+    updateAvail:'New version available. Refresh to update.',
+    installed:'Supervisor Dashboard installed.'
+  },
+  es: {
+    tabReports:'Reportes', tabData:'Datos', home:'Inicio', loading:'Cargando…',
+    errLoad:'Esta app no cargó dentro del panel.', errLink:'Abrir en el navegador',
+    online:'En línea', offline:'Sin conexión', opening:'Abriendo {label}…',
+    installAvail:'Se puede instalar Supervisor Dashboard.',
+    installHint:'Usá el menú del navegador y elegí Instalar app / Agregar a pantalla de inicio.',
+    updateAvail:'Hay una nueva versión. Actualizá para verla.',
+    installed:'Supervisor Dashboard instalado.'
+  }
+};
+let currentLang = localStorage.getItem('pci-lang') === 'es' ? 'es' : 'en';
+
+function t(key, vars){
+  let s = (I18N[currentLang] && I18N[currentLang][key]) || I18N.en[key] || key;
+  if (vars) for (const k in vars) s = s.split('{'+k+'}').join(vars[k]);
+  return s;
+}
+
+function applyLanguage(){
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
+  document.querySelectorAll('[data-en][data-es]').forEach(el => {
+    el.textContent = currentLang === 'es' ? el.getAttribute('data-es') : el.getAttribute('data-en');
+  });
+  document.getElementById('hdrStatusText').textContent = navigator.onLine ? t('online') : t('offline');
+  document.getElementById('langBtnLabel').textContent = currentLang.toUpperCase();
+  document.querySelectorAll('.lang-opt').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-lang') === currentLang);
+  });
+}
+
+function setLanguage(lang){
+  currentLang = lang === 'es' ? 'es' : 'en';
+  localStorage.setItem('pci-lang', currentLang);
+  applyLanguage();
+}
+
+document.getElementById('langBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const menu = document.getElementById('langMenu');
+  const willOpen = menu.hidden;
+  menu.hidden = !willOpen;
+  document.getElementById('langBtn').setAttribute('aria-expanded', String(willOpen));
+});
+document.querySelectorAll('.lang-opt').forEach(btn => {
+  btn.addEventListener('click', () => {
+    setLanguage(btn.getAttribute('data-lang'));
+    document.getElementById('langMenu').hidden = true;
+    document.getElementById('langBtn').setAttribute('aria-expanded', 'false');
+  });
+});
+document.addEventListener('click', () => {
+  document.getElementById('langMenu').hidden = true;
+  document.getElementById('langBtn').setAttribute('aria-expanded', 'false');
+});
+
+applyLanguage();
 
 /* Clock */
 function updateClock(){
@@ -632,7 +733,7 @@ setInterval(updateClock, 10000);
 function updateOnlineStatus(){
   const online = navigator.onLine;
   document.getElementById('hdrStatusDot').classList.toggle('offline', !online);
-  document.getElementById('hdrStatusText').textContent = online ? 'Online' : 'Offline';
+  document.getElementById('hdrStatusText').textContent = online ? t('online') : t('offline');
 }
 updateOnlineStatus();
 window.addEventListener('online', updateOnlineStatus);
@@ -688,7 +789,7 @@ if (navigator.geolocation){
             if (!worker) return;
             worker.addEventListener('statechange', function(){
               if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-                showToast('New version available. Refresh to update.');
+                showToast(t('updateAvail'));
               }
             });
           });
@@ -701,12 +802,12 @@ if (navigator.geolocation){
     e.preventDefault();
     deferredInstallPrompt = e;
     window.__pwaInstallAvailable = true;
-    showToast('Supervisor Dashboard can be installed.');
+    showToast(t('installAvail'));
   });
 
   window.installSupervisorPWA = async function(){
     if (!deferredInstallPrompt) {
-      showToast('Use your browser menu and choose Install app / Add to Home Screen.');
+      showToast(t('installHint'));
       return false;
     }
     deferredInstallPrompt.prompt();
@@ -719,7 +820,7 @@ if (navigator.geolocation){
   window.addEventListener('appinstalled', function(){
     deferredInstallPrompt = null;
     window.__pwaInstallAvailable = false;
-    showToast('Supervisor Dashboard installed.');
+    showToast(t('installed'));
   });
 })();
 </script>
