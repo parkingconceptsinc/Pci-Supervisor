@@ -488,6 +488,8 @@ function openApp(url, label){
   const errorBox = document.getElementById('appViewError');
   const errorLink = document.getElementById('appViewErrorLink');
 
+  const alreadyOpen = view.classList.contains('open');
+
   title.textContent = label;
   errorLink.href = url;
   errorBox.classList.remove('show');
@@ -497,7 +499,13 @@ function openApp(url, label){
   view.classList.add('open');
   view.setAttribute('aria-hidden', 'false');
 
-  if (!history.state || history.state.appView !== url) {
+  // Switching to a different report while the viewer is already open replaces
+  // the current history entry instead of stacking a new one — otherwise the
+  // back button needs two presses to reach home (the first just pops back to
+  // the previous report, invisibly, which feels like it's stuck doing nothing).
+  if (alreadyOpen) {
+    history.replaceState({ appView: url }, '', '');
+  } else if (!history.state || history.state.appView !== url) {
     history.pushState({ appView: url }, '', '');
   }
 
@@ -529,6 +537,27 @@ document.getElementById('appViewFrame').addEventListener('load', () => {
 window.addEventListener('popstate', (e) => {
   if (!e.state || !e.state.appView) closeApp(true);
 });
+
+/* Edge swipe-to-go-back (iOS has no hardware/gesture back at all inside an
+   installed PWA, and gesture-nav Android phones don't fire anything a page
+   can hook until the OS-level swipe completes). Mirrors iOS's own
+   convention: press near the left edge, drag right, release. */
+(function(){
+  const view = document.getElementById('appView');
+  const EDGE = 24, MIN_DX = 80, MAX_DY = 60, MAX_MS = 600;
+  let sx = null, sy = null, st = null;
+  view.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1 || e.touches[0].clientX > EDGE) { sx = null; return; }
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; st = Date.now();
+  }, {passive:true});
+  view.addEventListener('touchend', (e) => {
+    if (sx === null) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - sx, dy = Math.abs(t.clientY - sy), dt = Date.now() - st;
+    sx = null;
+    if (dx > MIN_DX && dy < MAX_DY && dt < MAX_MS) closeApp();
+  }, {passive:true});
+})();
 
 function showTab(tab, btn){
   document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('active'); p.hidden = true;});
