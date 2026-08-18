@@ -1,10 +1,14 @@
-const CACHE_NAME = "supervisor-dashboard-v1";
+const CACHE_NAME = "supervisor-dashboard-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
+  "./assets/logo.png",
+  "./assets/bg.jpg",
   "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icons/icon-512.png",
+  "./icons/icon-192-maskable.png",
+  "./icons/icon-512-maskable.png"
 ];
 
 self.addEventListener("install", event => {
