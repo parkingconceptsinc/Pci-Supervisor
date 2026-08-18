@@ -100,6 +100,7 @@ body{
   font-variant-numeric:tabular-nums;
   line-height:1;
 }
+.hdr-clock-ampm{font-size:0.45em;font-weight:600;margin-left:3px;letter-spacing:0.03em;color:var(--text-mid);}
 @media (max-width:360px){
   .brand-mark img{width:130px}
   .hdr-clock{font-size:22px}
@@ -589,9 +590,11 @@ function showToast(msg){
 /* Clock */
 function updateClock(){
   const now = new Date();
-  const hh = String(now.getHours()).padStart(2,'0');
+  const h24 = now.getHours();
+  const ampm = h24 >= 12 ? 'PM' : 'AM';
+  const hh = String(h24 % 12 || 12);
   const mm = String(now.getMinutes()).padStart(2,'0');
-  document.getElementById('hdrClock').textContent = `${hh}:${mm}`;
+  document.getElementById('hdrClock').innerHTML = `${hh}:${mm}<span class="hdr-clock-ampm">${ampm}</span>`;
 }
 updateClock();
 setInterval(updateClock, 10000);
@@ -619,11 +622,11 @@ function setWeatherIcon(code){
 }
 
 function loadWeather(lat, lon){
-  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=celsius`)
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit`)
     .then(r => r.json())
     .then(data => {
       const t = Math.round(data.current.temperature_2m);
-      document.getElementById('hdrWeatherTemp').textContent = t + '°C';
+      document.getElementById('hdrWeatherTemp').textContent = t + '°F';
       setWeatherIcon(data.current.weather_code);
     })
     .catch(() => { document.getElementById('hdrWeatherTemp').textContent = '--°'; });
