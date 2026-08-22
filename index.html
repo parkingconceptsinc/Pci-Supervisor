@@ -497,20 +497,25 @@ const DATA = [
   { href: "https://script.google.com/macros/s/AKfycbz2KaANhRWIS8ibyWljznW04M6PJoF5PJuNbzve42nqXDvn_mYBqfTlBISf6jb4prRi/exec?page=dashboard",
     icon: "icon-fuel", label: "FUEL EXPENSE TRACKER", sub: "Live spreadsheet", subEs: "Hoja de cálculo en vivo" },
   { href: "https://parkingconceptsinc.gpstrackit.com/users/sign_in",
-    icon: "icon-gps", label: "FLEET GPS TRACKING", sub: "Live vehicle locations", subEs: "Ubicación de vehículos en vivo" }
+    icon: "icon-gps", label: "FLEET GPS TRACKING", sub: "Live vehicle locations", subEs: "Ubicación de vehículos en vivo", external: true }
 ];
 
 function renderList(containerId, items){
   const container = document.getElementById(containerId);
-  container.innerHTML = items.map(item => `
-    <button type="button" class="neu-btn" onclick="doRipple(event,'${item.label.replace(/'/g,"\\'")}');openApp('${item.href}','${item.label.replace(/'/g,"\\'")}')">
+  container.innerHTML = items.map(item => {
+    const label = item.label.replace(/'/g,"\\'");
+    const href = item.href.replace(/'/g,"\\'");
+    const openCall = item.external ? `openExternal('${href}')` : `openApp('${href}','${label}')`;
+    return `
+    <button type="button" class="neu-btn" onclick="doRipple(event,'${label}');${openCall}">
       <div class="neu-icon" aria-hidden="true"><svg><use href="#${item.icon}"></use></svg></div>
       <div class="neu-text">
         <span class="neu-label">${item.label}</span>
         <span class="neu-sub" data-en="${item.sub}" data-es="${item.subEs}">${item.sub}</span>
       </div>
     </button>
-  `).join('');
+  `;
+  }).join('');
 }
 
 renderList('list-reports', REPORTS);
@@ -519,6 +524,15 @@ renderList('list-data', DATA);
 /* In-app view: opens every linked app in an iframe inside this window,
    so the PWA stays a single ecosystem instead of handing off to the browser. */
 let appViewOpenTimer = null;
+
+/* Third-party sites that require a real login session (e.g. GPS Trackit)
+   don't work inside the app-view iframe: cross-origin auth cookies get
+   blocked there, so sign-in silently fails to persist. Those open in a
+   normal browser tab instead, where cookies and mobile layout work as on
+   any other site. */
+function openExternal(url){
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
 
 function openApp(url, label){
   const view = document.getElementById('appView');
