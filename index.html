@@ -389,6 +389,10 @@ body{
       <line x1="12.5" y1="18" x2="11.7" y2="20.3"/>
       <line x1="16.5" y1="18" x2="15.7" y2="20.3"/>
     </symbol>
+    <symbol id="icon-gps" viewBox="0 0 24 24">
+      <path d="M12 21s7-7.5 7-12A7 7 0 0 0 5 9c0 4.5 7 12 7 12z"/>
+      <circle cx="12" cy="9" r="2.3"/>
+    </symbol>
   </defs>
 </svg>
 
@@ -491,7 +495,9 @@ const DATA = [
   { href: "https://script.google.com/macros/s/AKfycbz3RhlSBw7cRauNCgah3HuvHVLRVwzXT3wOLAs_FUFAdVqbzFIsecnimA_DarB7Ir0s/exec?page=dashboard",
     icon: "icon-report", label: "REPORTS", sub: "Reports dashboard", subEs: "Panel de reportes" },
   { href: "https://script.google.com/macros/s/AKfycbz2KaANhRWIS8ibyWljznW04M6PJoF5PJuNbzve42nqXDvn_mYBqfTlBISf6jb4prRi/exec?page=dashboard",
-    icon: "icon-fuel", label: "FUEL EXPENSE TRACKER", sub: "Live spreadsheet", subEs: "Hoja de cálculo en vivo" }
+    icon: "icon-fuel", label: "FUEL EXPENSE TRACKER", sub: "Live spreadsheet", subEs: "Hoja de cálculo en vivo" },
+  { href: "https://parkingconceptsinc.gpstrackit.com/users/sign_in",
+    icon: "icon-gps", label: "FLEET GPS TRACKING", sub: "Live vehicle locations", subEs: "Ubicación de vehículos en vivo" }
 ];
 
 function renderList(containerId, items){
